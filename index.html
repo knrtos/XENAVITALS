@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Health Metrics Table</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: transparent;
+            color: #054607;
+            font-family: "Comfortaa", sans-serif;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10px;
+            font-size: 20px;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        th, td {
+            border: 5px solid #498202;
+            padding: 20px;
+            color: #054607;
+            background: rgba(254, 255, 234);
+            border-radius: 5px; /* Rounded edges */
+            text-align: center; /* Center align all text in th and td */
+        }
+
+        th {
+            background-color: #82A436;
+            color: white;
+            font-weight: bold;
+        }
+
+        td:hover {
+            background-color: #447804;
+            color: white;
+            cursor: pointer;
+        }
+
+        .bg-warning {
+            background-color: #498202;
+            color: white;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        // Load data from local storage or initialize with default values
+        var sennaHealthData = JSON.parse(localStorage.getItem('sennaHealthData')) || [
+            {
+                sennaRecordDate: "3/10/25",
+                sennaRecordTime: "10 A.M.",
+                sennaBodyTemp: "36.8 CELSIUS",
+                sennaHeartRate: "90 BPM",
+                sennaBreathingRate: "20 BPM"
+            }
+        ];
+
+        var tableMarkup = '<table class="table table-hover">';
+        tableMarkup += '<thead><tr><th>DATE</th><th>TIME</th><th>TEMPERATURE</th><th>PULSE RATE</th><th>RESPIRATORY RATE</th></tr></thead>';
+        tableMarkup += '<tbody>';
+        
+        // Populate the table with data
+        $.each(sennaHealthData, function(index, record) {
+            tableMarkup += `<tr>
+                        <td><div class="row_data sennaRecordDate" edit_type="click" contenteditable="true">${record.sennaRecordDate}</div></td>
+                        <td><div class="row_data sennaRecordTime" edit_type="click" contenteditable="true">${record.sennaRecordTime}</div></td>
+                        <td><div class="row_data sennaBodyTemp" edit_type="click" contenteditable="true">${record.sennaBodyTemp}</div></td>
+                        <td><div class="row_data sennaHeartRate" edit_type="click" contenteditable="true">${record.sennaHeartRate}</div></td>
+                        <td><div class="row_data sennaBreathingRate" edit_type="click" contenteditable="true">${record.sennaBreathingRate}</div></td>
+                    </tr>`;
+        });
+        
+        tableMarkup += '</tbody></table>';
+        
+        $('.tbl_user_data').html(tableMarkup);
+
+        // Editable functionality for the health metrics columns
+        $(document).on('click', '.row_data', function(event) {
+            event.preventDefault(); 
+            if ($(this).attr('edit_type') == 'button') return false;
+            $(this).attr('contenteditable', 'true').addClass('bg-warning').focus();
+        });
+
+        $(document).on('focusout', '.row_data', function(event) {
+            event.preventDefault();
+            if ($(this).attr('edit_type') == 'button') return false;
+            $(this).removeClass('bg-warning');
+            saveUpdatedData(); // Save data on focus out
+        });
+
+        // Save updated data to local storage
+        function saveUpdatedData() {
+            var dataToSave = [];
+            $('tbody tr').each(function() {
+                var sennaRecordDate = $(this).find('.sennaRecordDate').text();
+                var sennaRecordTime = $(this).find('.sennaRecordTime').text();
+                var sennaBodyTemp = $(this).find('.sennaBodyTemp').text();
+                var sennaHeartRate = $(this).find('.sennaHeartRate').text();
+                var sennaBreathingRate = $(this).find('.sennaBreathingRate').text();
+                dataToSave.push({ sennaRecordDate: sennaRecordDate, sennaRecordTime: sennaRecordTime, sennaBodyTemp: sennaBodyTemp, sennaHeartRate: sennaHeartRate, sennaBreathingRate: sennaBreathingRate });
+            });
+            localStorage.setItem('sennaHealthData', JSON.stringify(dataToSave));
+        }
+    });
+    </script>
+
+</head>
+<body>
+    <div class="tbl_user_data"></div>
+</body>
+</html>
